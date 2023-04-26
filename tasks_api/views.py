@@ -4,9 +4,11 @@ from rest_framework import status
 from rest_framework import permissions
 from .models import Task
 from .serializers import TaskSerializer
+from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated
 
 class TaskListApiView(APIView):
-    # adding permission to check if user is authnticated
+    # adding permission to check if user is authenticated
     permission_classes = [permissions.IsAuthenticated]
 
     # get for listing all the tasks for given requested user
@@ -15,11 +17,13 @@ class TaskListApiView(APIView):
         serializer = TaskSerializer(tasks, many = True)
         return Response(serializer.data, status = status.HTTP_200_OK)
 
+    # creating the new task with given data
     def post(self, request, *args, **kwargs):
-        # creating the new task with given data
         data = {
             'name': request.data.get('name'),
-            'assigned_to': request.user.id
+            'description': request.data.get('description'),
+            'status': request.data.get('status', 'Nowy'),
+            'assigned_to': request.data.get('assigned_to')
         }
         serializer = TaskSerializer(data=data)
         if serializer.is_valid():
@@ -73,4 +77,3 @@ class TaskDetailApiView(APIView):
             {"res": "Object deleted!"},
             status=status.HTTP_200_OK
         )
-
