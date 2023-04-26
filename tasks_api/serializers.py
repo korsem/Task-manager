@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django import forms
 from .models import Task
 
 class UserSerializer(serializers.ModelSerializer):
@@ -8,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username']
 
 class TaskSerializer(serializers.ModelSerializer):
-    # assigned_to = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all(), required=False)
+    assigned_to = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
 
     class Meta:
         model = Task

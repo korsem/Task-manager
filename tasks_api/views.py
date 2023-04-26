@@ -4,12 +4,13 @@ from rest_framework import status
 from rest_framework import permissions
 from .models import Task
 from .serializers import TaskSerializer
+from django import forms
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 
 class TaskListApiView(APIView):
     # adding permission to check if user is authenticated
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     # get for listing all the tasks for given requested user
     def get(self, request, *args, **kwargs):
@@ -19,17 +20,15 @@ class TaskListApiView(APIView):
 
     # creating the new task with given data
     def post(self, request, *args, **kwargs):
-        data = {
-            'name': request.data.get('name'),
-            'description': request.data.get('description'),
-            'status': request.data.get('status', 'Nowy'),
-            'assigned_to': request.data.get('assigned_to')
-        }
-        serializer = TaskSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.assigned_to = form.cleaned_data['assigned_to']
+            task.save()
+            serializer = TaskSerializer(task)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TaskDetailApiView(APIView):
     # adding permission to check if user is authnticated
