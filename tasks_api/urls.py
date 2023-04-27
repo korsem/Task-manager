@@ -1,11 +1,9 @@
 from django.urls import path
-# from django.conf.urls import url
-from .views import (
-    TaskListApiView,
-    TaskDetailApiView
-)
+from django.views.decorators.csrf import csrf_exempt
+from .views import TaskListApiView, TaskDetailApiView, ListUsers
 
 urlpatterns = [
-    path('api', TaskListApiView.as_view()),
+    path('api/users/', ListUsers.as_view()),
+    path('api/', csrf_exempt(TaskListApiView.as_view())),
     path('api/<int:task_id>/', TaskDetailApiView.as_view())
 ]
