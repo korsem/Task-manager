@@ -10,7 +10,7 @@ from django.shortcuts import render
 
 class HomeApiView(APIView):
     def get(self, request):
-        data = {'message': 'This is a home for Task managment app. <br> To see access the list of users get /api/users <br> To see the tasks get /api/ <br> To see the details of the task get /api/<task_id>'}
+        data = {'message': 'This is a home for Task management app. <br> To see access the list of users get /api/users <br> To see the tasks get /api/ <br> To see the details of the task get /api/<task_id>'}
         return render(request, 'home.html', data)
 
 class ListUsers(APIView):
@@ -24,9 +24,7 @@ class ListUsers(APIView):
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request, format=None):
-        """
-        Return a list of all users.
-        """
+
         usernames = [user.username for user in User.objects.all()]
         return Response(usernames)
 class TaskListApiView(APIView):
@@ -48,6 +46,7 @@ class TaskListApiView(APIView):
             'status': request.data.get('status', 'Nowy'),
             'assigned_to': request.data.get('assigned_to')
         }
+        print(data)
         serializer = TaskSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -58,20 +57,34 @@ class TaskDetailApiView(APIView):
     # adding permission to check if user is authnticated
     permission_classes = [permissions.IsAuthenticated]
     # retrieve
-    def get_object(self, request, task_id, *args, **kwargs):
-        task_instance = self.get_object(task_id, request.user.id)
+    # def get_object(self, request, task_id, *args, **kwargs):
+    #     task_instance = self.get_object(task_id)
+    #     if not task_instance:
+    #         return Response(
+    #             {"rest": "Object with task id does not exist"},
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
+    #     serializer = TaskSerializer(task_instance)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+
+# usuwanie tylko przypisanych do siebie
+    def get_object(self, task_id):
+        task_instance = Task.objects.filter(id=task_id, assigned_to=self.request.user.id).first()
+        return task_instance
+
+    def get(self, request, task_id, *args, **kwargs):
+        # retrieve task with given task_id if exist
+        task_instance = self.get_object(task_id)
         if not task_instance:
             return Response(
-                {"rest": "Object with task id does not exist"},
+                {"res": "Object with task id does not exist"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         serializer = TaskSerializer(task_instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    # update
     def put(self, request, task_id, *args, **kwargs):
         # update task with given task id if exist
-        task_instance = self.get_object(task_id, request.user.id)
+        task_instance = self.get_object(task_id)
         if not task_instance:
             return Response(
                 {"res": "Object with task id does not exist"}
@@ -89,7 +102,7 @@ class TaskDetailApiView(APIView):
     # delete
     def delete(self, request, task_id, *args, **kwargs):
         # deletes the given task with task_id if exists
-        task_instance = self.get.object(task_id, request.user.id)
+        task_instance = self.get_object(task_id,)
         if not task_instance:
             return Response(
                 {"res": "Object with task id does not exist"},
