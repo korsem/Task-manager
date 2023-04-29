@@ -1,9 +1,7 @@
 # Task-manager
-Basic backend for task manager CRUD app in Django, Django rest with PostgreSQL.
+Backend for the basic CRUD app using Django Rest with PostgreSQL.
 
 # Most important for now
-- Powinna być możliwość wyboru użytkownika z listy do przypisania pola
-- Edycję zadania - opcja pozwalająca edytować wszystkie pola zadania oprócz id. dziala, ale w przypadku braku zmiany nazwy pozosaje ta sama
 - Przedstawienie filtrowanej listy zadań - opcja pozwalająca wyświetlić wszystkie zadania w systemie, z możliwością filtracji po każdym polu (tj. id, nazwie, opisie, statusie i użytkowniku). Przykładowo, powinna być możliwość wyświetlenia listy:
    * zadań przypisanych do danego użytkownika
    * wszystkich zadań rozwiązanych albo nowych albo w toku.
@@ -22,3 +20,10 @@ Basic backend for task manager CRUD app in Django, Django rest with PostgreSQL.
 * Aplikacja będzie posiadać testy z użyciem pytest,
 * W pliku README.md zawarta będzie dokumentacja przedstawiająca w jaki sposób można korzystać z API oraz przykładowe odpytania końcówek np. przy użyciu komendy curl.
 -> link do curla https://stackabuse.com/creating-a-rest-api-with-django-rest-framework/
+
+## Requirements 
+-Python ...
+## Installation
+1) Clone the repository
+
+## Use

@@ -4,7 +4,7 @@ from django import forms
 from .models import Task
 
 class TaskSerializer(serializers.ModelSerializer):
-    assigned_to = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
+    assigned_to = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all(), required=False)
     class Meta:
         model = Task
         fields = ["id", "name", "description", "status", "assigned_to"]
