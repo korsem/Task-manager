@@ -67,7 +67,7 @@ class TaskDetailApiView(APIView):
     #     serializer = TaskSerializer(task_instance)
     #     return Response(serializer.data, status=status.HTTP_200_OK)
 
-# usuwanie tylko przypisanych do siebie
+# przechodzenie do szczególow jest mozliwe tylko do taskow przypisanych do siebie
     def get_object(self, task_id):
         task_instance = Task.objects.filter(id=task_id, assigned_to=self.request.user.id).first()
         return task_instance
@@ -83,15 +83,17 @@ class TaskDetailApiView(APIView):
         serializer = TaskSerializer(task_instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
     def put(self, request, task_id, *args, **kwargs):
-        # update task with given task id if exist
+        # update task with given task id if exist, updating every field
         task_instance = self.get_object(task_id)
         if not task_instance:
             return Response(
                 {"res": "Object with task id does not exist"}
             )
-        data = {  # check i dont need the other fields
+        data = {
             'name': request.data.get('name'),
-            'assigned_to': request.user.id,
+            'description': request.data.get('description'),
+            'status': request.data.get('status', 'Nowy'),
+            'assigned_to': request.data.get('assigned_to')
         }
         serializer = TaskSerializer(instance=task_instance, data=data, partial=True)
         if serializer.is_valid():
@@ -99,6 +101,19 @@ class TaskDetailApiView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    # partial update
+    def patch(self, request, task_id, *args, **kwargs):
+        # update task with given task id if exist, updating every given fields
+        task_instance = self.get_object(task_id)
+        if not task_instance:
+            return Response(
+                {"res": "Object with task id does not exist"}
+            )
+        serializer = TaskSerializer(instance=task_instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     # delete
     def delete(self, request, task_id, *args, **kwargs):
         # deletes the given task with task_id if exists
