@@ -9,11 +9,13 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render
 
-
+# Home api View
 class HomeApiView(APIView):
     def get(self, request):
         data = {'message': 'This is a home for Task management app. <br> To see access the list of users get /api/users <br> To see the tasks get /api/ <br> To see the details of the task get /api/<task_id>'}
         return render(request, 'home.html', data)
+
+# Every user has an accesss to list users
 class ListUsers(APIView):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     permission_classes = [IsAuthenticated]
@@ -21,26 +23,21 @@ class ListUsers(APIView):
     def get(self, request, format=None):
         usernames = [user.username for user in User.objects.all()]
         return Response(usernames)
-# class ListUsers(APIView):
-#     """
-#     View to list all users in the system.
-#
-#     * Requires token authentication.
-#     * Only admin users are able to access this view.
-#     """
-#     authentication_classes = [authentication.TokenAuthentication]
-#     permission_classes = [permissions.IsAdminUser]
-#
-#     def get(self, request, format=None):
-#
-#         usernames = [user.username for user in User.objects.all()]
-#         return Response(usernames)
+
+# listing tasks assigned to a particular user
+class UserTasksView(APIView):
+    def get(self, request, user_id):
+        tasks = Task.objects.filter(assigned_to=user_id)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
+# View for listing all of the tasks
 class TaskListApiView(APIView):
 
     # adding permission to check if user is authenticated
     permission_classes = [permissions.IsAuthenticated]
 
-    # get for listing all the tasks for given requested user
+    # get for listing all the tasks
     def get(self, request, *args, **kwargs):
         tasks = Task.objects.all()
         serializer = TaskSerializer(tasks, many = True)
@@ -61,21 +58,12 @@ class TaskListApiView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# view for displaying the results of a specific task
+# only available if the task belogs to a checking person to be changed problably
 class TaskDetailApiView(APIView):
-    # adding permission to check if user is authnticated
+    # adding permission to check if user is authenticated
     permission_classes = [permissions.IsAuthenticated]
-    # retrieve
-    # def get_object(self, request, task_id, *args, **kwargs):
-    #     task_instance = self.get_object(task_id)
-    #     if not task_instance:
-    #         return Response(
-    #             {"rest": "Object with task id does not exist"},
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-    #     serializer = TaskSerializer(task_instance)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
-# przechodzenie do szczególow jest mozliwe tylko do taskow przypisanych do siebie
     def get_object(self, task_id):
         task_instance = Task.objects.filter(id=task_id, assigned_to=self.request.user.id).first()
         return task_instance
@@ -91,7 +79,7 @@ class TaskDetailApiView(APIView):
         serializer = TaskSerializer(task_instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
     def put(self, request, task_id, *args, **kwargs):
-        # update task with given task id if exist, updating every field
+        # update every field of task with given task id if exists
         task_instance = self.get_object(task_id)
         if not task_instance:
             return Response(
@@ -111,7 +99,7 @@ class TaskDetailApiView(APIView):
 
     # partial update
     def patch(self, request, task_id, *args, **kwargs):
-        # update task with given task id if exist, updating every given fields
+        # update task with given task id if exist, updating chosen fields
         task_instance = self.get_object(task_id)
         if not task_instance:
             return Response(
@@ -122,6 +110,7 @@ class TaskDetailApiView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     # delete
     def delete(self, request, task_id, *args, **kwargs):
         # deletes the given task with task_id if exists
@@ -136,3 +125,15 @@ class TaskDetailApiView(APIView):
             {"res": "Object deleted!"},
             status=status.HTTP_200_OK
         )
+
+# zadań zawierających w opisie lub nazwie dowolne słowo np. 'gotowanie', bez względu na wielkość liter.
+class SearchTasksView(APIView):
+    def get(self, request):
+        print("struggle")
+
+# filtering and searching by status
+class StatusTasksView(APIView):
+    def get(self, request, status):
+        tasks = Task.objects.filter(status=status)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)

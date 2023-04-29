@@ -3,8 +3,6 @@ Backend for the basic CRUD app using Django Rest with PostgreSQL.
 
 # Most important for now
 - Przedstawienie filtrowanej listy zadań - opcja pozwalająca wyświetlić wszystkie zadania w systemie, z możliwością filtracji po każdym polu (tj. id, nazwie, opisie, statusie i użytkowniku). Przykładowo, powinna być możliwość wyświetlenia listy:
-   * zadań przypisanych do danego użytkownika
-   * wszystkich zadań rozwiązanych albo nowych albo w toku.
    * zadań zawierających w opisie lub nazwie dowolne słowo np. 'gotowanie', bez względu na wielkość liter.
 - Przedstawienie historii zmian zadań - opcja pozwala wyświetlić historię wszystkich dokonanych zmian dla zadań. Należy zapewnić odpowiednią filtrację pozwalającą wyświetlić np. tylko historię zmian dla danego zadania. Z końcówki powinna być możliwość otrzymania informacji, jakie dane zawierało zadanie w konkretnym czasie (np. jaki status miało dane zadanie kilka dni temu i do kogo było przypisane).
 - plik README.md, który będzie zawierać szczegółową instrukcję uruchomienia aplikacji. Powinna zawierać minimum informacje potrzebne do uruchomienia bazy danych i serwera aplikacji.
