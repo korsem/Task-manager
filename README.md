@@ -1,14 +1,10 @@
 # Task-manager
-Backend for the basic CRUD app using Django Rest with PostgreSQL.
+<h3> Backend for the basic CRUD app using Django Rest with PostgreSQL. </h3>
 
 # Most important for now
 - Przedstawienie historii zmian zadań - opcja pozwala wyświetlić historię wszystkich dokonanych zmian dla zadań. Należy zapewnić odpowiednią filtrację pozwalającą wyświetlić np. tylko historię zmian dla danego zadania. Z końcówki powinna być możliwość otrzymania informacji, jakie dane zawierało zadanie w konkretnym czasie (np. jaki status miało dane zadanie kilka dni temu i do kogo było przypisane).
 - plik README.md, który będzie zawierać szczegółową instrukcję uruchomienia aplikacji. Powinna zawierać minimum informacje potrzebne do uruchomienia bazy danych i serwera aplikacji.
-
-# Działanie
-- zwykły user ma dostęp tylko do swoich przypisanych zadań i tylko on je moze moze usuwac i modfyfikowac
-- wyswietlac zwykly user moze wszystkie
-- chociaz ja mam superusera to wszystko powinnam moc
+- basics permissions
 
 # Dodatkowym atutem będzie jeśli:
 * Zostanie zaimplementowane logowanie użytkowników i rejestracja użytkowników,
@@ -18,7 +14,11 @@ Backend for the basic CRUD app using Django Rest with PostgreSQL.
 -> link do curla https://stackabuse.com/creating-a-rest-api-with-django-rest-framework/
 
 ## Requirements 
--Python ...
+* Python 3.10
+* Django 4.2
+* Django Rest framework
+* psycopg2
+
 ## Installation
 1) Clone the repository
 

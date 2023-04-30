@@ -5,7 +5,8 @@ from .views import (
     ListUsers,
     UserTasksView,
     SearchTasksView,
-    FilterTasksView
+    FilterTasksView,
+    HistoryTaskView
 )
 
 urlpatterns = [
@@ -14,5 +15,6 @@ urlpatterns = [
     path('api/', TaskListApiView.as_view()),
     path('api/<int:task_id>/', TaskDetailApiView.as_view()),
     path('api/search/<str:q>/', SearchTasksView.as_view()),
-    path('api/search/<str:field>/<str:q>/', FilterTasksView.as_view())
+    path('api/search/<str:field>/<str:q>/', FilterTasksView.as_view()),
+    path('api/history/<int:task_id>/', HistoryTaskView.as_view())
 ]

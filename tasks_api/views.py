@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Task
-from .serializers import TaskSerializer
+from .models import Task, TaskHistory
+from .serializers import TaskSerializer, TaskHistorySerializer
 from django.contrib.auth.models import User
 from rest_framework import authentication, permissions
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
@@ -65,12 +65,18 @@ class TaskDetailApiView(APIView):
     # adding permission to check if user is authenticated
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_object(self, task_id):
+    # returns the objects for requested user
+    def get_object_user(self, task_id):
         task_instance = Task.objects.filter(id=task_id, assigned_to=self.request.user.id).first()
         return task_instance
 
+    # returns all objects
+    def get_object(self, task_id):
+        task_instance = Task.objects.filter(id=task_id).first()
+        return task_instance
+
+    # retrieve task with given task_id if exist
     def get(self, request, task_id, *args, **kwargs):
-        # retrieve task with given task_id if exist
         task_instance = self.get_object(task_id)
         if not task_instance:
             return Response(
@@ -108,7 +114,7 @@ class TaskDetailApiView(APIView):
             )
         serializer = TaskSerializer(instance=task_instance, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(request=request)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -134,6 +140,7 @@ class SearchTasksView(APIView):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
+# filtering and searching by a keyword in a given field
 class FilterTasksView(APIView):
     def get(self, request, field, q):
         fields = {
@@ -151,3 +158,9 @@ class FilterTasksView(APIView):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
+class HistoryTaskView(APIView):
+     def get(self, request, task_id):
+         task = Task.objects.get(id=task_id)
+         changes = TaskHistory.objects.filter(task=task).order_by('timestamp')
+         serializer = TaskHistorySerializer(changes, many=True)
+         return Response(serializer.data)
