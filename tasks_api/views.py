@@ -8,6 +8,7 @@ from rest_framework import authentication, permissions
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render
+from django.db.models import Q
 
 # Home api View
 class HomeApiView(APIView):
@@ -126,14 +127,27 @@ class TaskDetailApiView(APIView):
             status=status.HTTP_200_OK
         )
 
-# zadań zawierających w opisie lub nazwie dowolne słowo np. 'gotowanie', bez względu na wielkość liter.
+# filtering and searching by a keyword in either description or name
 class SearchTasksView(APIView):
-    def get(self, request):
-        print("struggle")
-
-# filtering and searching by status
-class StatusTasksView(APIView):
-    def get(self, request, status):
-        tasks = Task.objects.filter(status=status)
+    def get(self, request, q):
+        tasks = Task.objects.filter(Q(name__icontains=q) | Q(description__icontains=q)) # check if the parameter is in th desription field or name field
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
+
+class FilterTasksView(APIView):
+    def get(self, request, field, q):
+        fields = {
+            "id": "id",
+            "name": "name__icontains",
+            "description": "description__icontains",
+            "status": "status__iexact",
+            "assigned_to": "assigned_to__username__iexact"
+        }
+        if field not in fields:
+            return Response({"error": f"Invalid field '{field}'"}, status=400)
+        # then if field is valid i have filter contition "field:q", where q is a filter keyword
+        filter_condition = Q(**{fields[field]: q})
+        tasks = Task.objects.filter(filter_condition)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
