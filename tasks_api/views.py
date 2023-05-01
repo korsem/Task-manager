@@ -13,10 +13,13 @@ from django.db.models import Q
 # Home api View
 class HomeApiView(APIView):
     def get(self, request):
-        data = {'message': 'This is a home for Task management app. <br> To see access the list of users get /api/users <br> To see the tasks get /api/ <br> To see the details of the task get /api/<task_id>'}
+        data = {'message': 'Task manager is the basic CRUD app for managing tasks. <br> <br>'
+                           'By setting up the certain HTTP API Endpoints you can list existing tasks, add new one or delete an old one, you can also modify the existing one. <br> '
+                           'Moreover, you can search for a specific task by a keyword and access the history of the task changes. <br><br>'
+                            '<small>To get to know about a specific endpoinds you need to use see README</small>'}
         return render(request, 'home.html', data)
 
-# Every user has an accesss to list users
+# Every user has an access to list users
 class ListUsers(APIView):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     permission_classes = [IsAuthenticated]
@@ -100,7 +103,11 @@ class TaskDetailApiView(APIView):
         }
         serializer = TaskSerializer(instance=task_instance, data=data, partial=True)
         if serializer.is_valid():
+            user = request.user if request else None
+            task_history = TaskHistory.objects.create(task=task_instance, user=user, changes=serializer.validated_data)
             serializer.save()
+            task_history.changes = serializer.validated_data
+            task_history.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -112,9 +119,13 @@ class TaskDetailApiView(APIView):
             return Response(
                 {"res": "Object with task id does not exist"}
             )
-        serializer = TaskSerializer(instance=task_instance, data=request.data, partial=True)
+        serializer = TaskSerializer(instance=task_instance, data=request.data, partial=True,context={'request': request})
         if serializer.is_valid():
-            serializer.save(request=request)
+            user = request.user if request else None
+            task_history = TaskHistory.objects.create(task=task_instance, user=user, changes=serializer.validated_data)
+            serializer.save()
+            task_history.changes = serializer.validated_data
+            task_history.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

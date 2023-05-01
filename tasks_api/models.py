@@ -21,19 +21,6 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        request = kwargs.pop('request', None)
-        super(Task, self).save(*args, **kwargs)
-        changes = {
-            'name': self.name,
-            'description': self.description,
-            'status': self.status,
-            'assigned_to': self.assigned_to
-        }
-        user = request.user if request else None
-        TaskHistory.objects.create(task=self, user=user, changes=changes)
-
-
 class TaskHistory(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="history") # History of which task
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True) # user who has made the change most recenly

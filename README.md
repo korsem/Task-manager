@@ -2,7 +2,6 @@
 <h3> Backend for the basic CRUD app using Django Rest with PostgreSQL. </h3>
 
 # Most important for now
-- Przedstawienie historii zmian zadań - Z końcówki powinna być możliwość otrzymania informacji, jakie dane zawierało zadanie w konkretnym czasie (np. jaki status miało dane zadanie kilka dni temu i do kogo było przypisane).
 - plik README.md, który będzie zawierać szczegółową instrukcję uruchomienia aplikacji. Powinna zawierać minimum informacje potrzebne do uruchomienia bazy danych i serwera aplikacji.
 - basics permissions
 
