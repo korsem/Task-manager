@@ -2,10 +2,10 @@
 <h3> Backend for the basic CRUD app using Django Rest with PostgreSQL. </h3>
 
 ## Requirements 
-* Python 3.10
-* Django 4.2
+* Python 
+* Django 
 * Django Rest framework
-* psycopg2
+* PostgreSQL
 
 ## Installation
 1) Clone the repository 
