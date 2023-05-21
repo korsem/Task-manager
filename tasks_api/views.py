@@ -7,22 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework import permissions
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import render
 from django.db.models import Q
-
-
-# Home api View
-class HomeApiView(APIView):
-    def get(self, request):
-        data = {'message': 'Task manager is the basic CRUD app for managing tasks. <br> <br>'
-                           'By setting up the certain HTTP API Endpoints you can list existing tasks, '
-                           'add new one or delete an old one, you can also modify the existing one. <br> '
-                           'Moreover, you can search for a specific task by a keyword '
-                           'and access the history of the task changes. <br><br>'
-                            '<small>To get to know about a specific endpoinds you need to use see README</small>'
-                }
-
-        return render(request, 'home.html', data)
 
 
 # View for listing the users (every user has an access to it)
